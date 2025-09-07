@@ -14,6 +14,8 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe()); //валидации входящих данных.
 
+  app.setGlobalPrefix('api');
+
   // Запуск сервера: слушаем порт, указанный в переменной окружения PORT,
   // или используем порт 3000 по умолчанию.
   await app.listen(process.env.PORT ?? 3000);
