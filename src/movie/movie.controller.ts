@@ -8,31 +8,50 @@ import {
   Req,
   Res,
   Param,
+  Put,
+  Delete,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import type { Request, Response } from 'express';
+import { MovieDto } from './dto/movie.dto';
 
 @Controller({ path: 'movies', host: 'localhost' })
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
   @Get()
-  getMovies(@Query() query: any) {
-    return JSON.stringify(query);
-  }
-
-  @Post()
-  create(@Body() body: { title: string; genre: string }) {
-    return `Movie ${body.title} created with genre ${body.genre}`;
+  findAll() {
+    return this.movieService.findAll();
   }
 
   @Get(':id')
   findById(@Param('id') id: string) {
-    return { id };
+    return this.movieService.findById(id);
+  }
+
+  @Post()
+  create(@Body() dto: MovieDto) {
+    return this.movieService.create(dto);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() dto: MovieDto) {
+    return this.movieService.update(id, dto);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.movieService.delete(id);
+  }
+
+  @Get()
+  getMovies(@Query() query: any) {
+    return JSON.stringify(query);
   }
 
   @Get('headers')
-  getHeaders(@Headers() headers: any) {
+  @Get('headers')
+  getHeaders(@Headers() headers: Record<string, string>) {
     return headers;
   }
 
@@ -47,7 +66,7 @@ export class MovieController {
       method: req.method,
       url: req.url,
       headers: req.headers,
-      body: req.body,
+      body: req.body as Record<string, string>,
     };
   }
 
