@@ -9,7 +9,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToMany,
   JoinTable,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
+import { MoviePosterEntity } from './poster.entity';
 
 export enum Genre {
   DRAMA = 'DRAMA',
@@ -55,6 +58,16 @@ export class MovieEntity {
 
   @OneToMany(() => ReviewEntity, (review) => review.movie)
   reviews: ReviewEntity[];
+
+  @Column({ name: 'poster_id', type: 'uuid', nullable: true })
+  posterId: string;
+
+  @OneToOne(() => MoviePosterEntity, (poster) => poster.movie, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'poster_id' })
+  poster: MoviePosterEntity | null;
 
   @ManyToMany(() => ActorEntity, (actor) => actor.movies)
   @JoinTable({

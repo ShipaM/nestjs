@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MovieEntity } from './entities/movie.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { MovieDto } from './dto/movie.dto';
 import { ActorEntity } from 'src/actor/entities/actor.entity';
+import { MoviePosterEntity } from './entities/poster.entity';
 
 @Injectable()
 export class MovieService {
@@ -12,6 +13,8 @@ export class MovieService {
     private readonly movieRepository: Repository<MovieEntity>,
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
+    @InjectRepository(MoviePosterEntity)
+    private readonly posterRepository: Repository<MoviePosterEntity>,
   ) {}
 
   async findAll(): Promise<MovieEntity[]> {
@@ -31,6 +34,7 @@ export class MovieService {
       where: {
         id,
       },
+      relations: ['actors'],
     });
     if (!movie) {
       throw new NotFoundException('Movie not found');
@@ -39,12 +43,33 @@ export class MovieService {
   }
 
   async create(dto: MovieDto): Promise<MovieEntity> {
-    const { title, releaseYear, actorIds } = dto;
+    const { title, releaseYear, actorIds, imageUrl } = dto;
+
+    const actors = await this.actorRepository.find({
+      where: {
+        id: In(actorIds),
+      },
+    });
+
+    if (!actors || !actors.length)
+      throw new NotFoundException('Actors not found');
+
+    let poster: MoviePosterEntity | null = null;
+
+    if (imageUrl) {
+      poster = this.posterRepository.create({
+        url: imageUrl,
+      });
+      await this.posterRepository.save(poster);
+    }
+
     const movie = this.movieRepository.create({
       title,
       releaseYear,
-      actors: actorIds.map((id) => ({ id })),
+      poster,
+      actors,
     });
+
     return await this.movieRepository.save(movie);
   }
 
