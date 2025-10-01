@@ -3,10 +3,6 @@ import {
   Controller,
   Get,
   Post,
-  Query,
-  Headers,
-  Req,
-  Res,
   Param,
   Put,
   Delete,
@@ -42,36 +38,5 @@ export class MovieController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.movieService.delete(id);
-  }
-
-  @Get()
-  getMovies(@Query() query: any) {
-    return JSON.stringify(query);
-  }
-
-  @Get('headers')
-  @Get('headers')
-  getHeaders(@Headers() headers: Record<string, string>) {
-    return headers;
-  }
-
-  @Get('user-agent')
-  getUserAgent(@Headers('user-agent') userAgent: string) {
-    return { userAgent };
-  }
-
-  @Get('request')
-  getRequestDetails(@Req() req: Request) {
-    return {
-      method: req.method,
-      url: req.url,
-      headers: req.headers,
-      body: req.body as Record<string, string>,
-    };
-  }
-
-  @Get('response')
-  getResponseDetails(@Res() res: Response) {
-    res.status(200).json({ message: 'Response details' });
   }
 }
