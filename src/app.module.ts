@@ -8,9 +8,14 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { LoggingMiddleware } from './common/middlewares/logger.middleware';
+import { MovieModule } from './movie/movie.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    MovieModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
